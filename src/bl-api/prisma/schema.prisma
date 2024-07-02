@@ -10,6 +10,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
+model Nasa {
+  nasa_id          Int         @id @default(autoincrement())
+  name        String
+  nametype    String
+  recclass    String
+  mass        Float
+  fall        String
+  year        DateTime
+  reclat      Float
+  reclong     Float
+  geo_id Int       @unique @default(autoincrement())
+  geolocation Geolocation @relation(fields: [geo_id], references: [geo_id])
+
+  
+}
+
+model Geolocation {
+  geo_id          Int      @id @default(autoincrement())
+  type        String
+  coordinates String
+  nasa        Nasa?
+}
+
 model Teacher {
   name       String   @id
   city       String
