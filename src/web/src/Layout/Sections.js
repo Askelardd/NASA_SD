@@ -1,5 +1,7 @@
 import TopTeams from "../Menus/TopTeams";
 import Registar from "../Menus/UserCrud";
+import Login from "../Menus/Login";
+
 
 const Sections = [
   {
@@ -12,6 +14,12 @@ const Sections = [
     id: "user-crud",
     label: "User CRUD",
     content: <Registar />
+  },
+
+  {
+    id: "login",
+    label: "Login",
+    content: <Login />
   },
 
   {

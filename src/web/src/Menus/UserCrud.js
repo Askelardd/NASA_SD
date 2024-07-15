@@ -16,7 +16,8 @@ import {
     TableHead,
     TableRow,
     Paper,
-    IconButton
+    IconButton,
+    Alert
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 
@@ -26,6 +27,8 @@ function CRUD() {
     const [password, setPassword] = useState("");
     const [permission, setPermission] = useState("view");
     const [editingUser, setEditingUser] = useState(null);
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState("success");
 
     useEffect(() => {
         fetchUsers();
@@ -65,10 +68,15 @@ function CRUD() {
                 setPermission("view");
                 setEditingUser(null);
                 fetchUsers();
+                setMessageType("success");
+                setMessage(editingUser ? "User updated successfully" : "User registered successfully");
             } else {
-                console.error("Failed to send data to the server");
+                setMessageType("error");
+                setMessage("Failed to send data to the server");
             }
         } catch (error) {
+            setMessageType("error");
+            setMessage("Error sending data to the server");
             console.error("Error sending data to the server:", error);
         }
     };
@@ -81,10 +89,15 @@ function CRUD() {
 
             if (response.ok) {
                 fetchUsers();
+                setMessageType("success");
+                setMessage("User deleted successfully");
             } else {
-                console.error("Failed to delete user");
+                setMessageType("error");
+                setMessage("Failed to delete user");
             }
         } catch (error) {
+            setMessageType("error");
+            setMessage("Error deleting user");
             console.error("Error deleting user:", error);
         }
     };
@@ -109,6 +122,11 @@ function CRUD() {
                 <Typography component="h1" variant="h5">
                     {editingUser ? "Editar Utilizador" : "Registar"}
                 </Typography>
+                {message && (
+                    <Alert severity={messageType} sx={{ mt: 2 }}>
+                        {message}
+                    </Alert>
+                )}
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
