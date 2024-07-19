@@ -3,7 +3,7 @@ const cors = require("cors");
 const knexConfig = require("./knexfile").db;
 const knex = require("knex")(knexConfig);
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 
 // Middleware para autenticação
 const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token || req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+  const token = req.cookies.token || (req.headers['authorization'] && req.headers['authorization'].split(' ')[1]);
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
@@ -50,7 +50,7 @@ app.post("/login", async (req, res) => {
 
     const user = await knex("users").where({ username }).first();
 
-    if (!user || !bcrypt.compareSync(password, user.password)) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -91,7 +91,8 @@ app.post('/adduser', async (req, res) => {
       return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 8);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     await knex('users').insert({
       username,
       password: hashedPassword,
@@ -113,7 +114,7 @@ app.put('/users/:id', authenticateToken, authorize("admin"), async (req, res) =>
       return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 8);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await knex('users')
       .where({ id })

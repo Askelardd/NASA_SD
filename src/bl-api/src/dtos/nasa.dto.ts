@@ -1,42 +1,20 @@
-import { IsString, IsNumber, IsDate, IsOptional, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { GeolocationDto } from './geolocation.dto';
+// nasa.dto.ts
+export class GeolocationDto {
+  geo_id?: number;
+  type: string;
+  coordinates: string;
+}
 
 export class NasaDto {
-  @IsOptional()
-  @IsNumber()
-  nasa_id: number;
-
-  @IsString()
+  nasa_id?: number;
   name: string;
-
-  @IsString()
   nametype: string;
-
-  @IsString()
   recclass: string;
-
-  @IsNumber()
   mass: number;
-
-  @IsString()
   fall: string;
-
-  @IsDate()
-  @Type(() => Date)
   year: Date;
-
-  @IsNumber()
   reclat: number;
-
-  @IsNumber()
   reclong: number;
-
-  @IsOptional()
-  @IsNumber()
-  geo_id: number;
-
-  @ValidateNested()
-  @Type(() => GeolocationDto)
+  geo_id?: number;
   geolocation: GeolocationDto;
 }
