@@ -79,25 +79,19 @@ export class NasaService {
     try {
       // Convertendo o campo year para Date
       nasa.year = new Date(nasa.year);
-
+      // Valida o input conforme o zod schema
       const validatedNasa = NasaInsertSchema.parse(nasa);
-
       // Verificar ou criar a geolocalização
-      const geolocation = await this.prisma.geolocation.update
-      (
-        {
-          where: {
-            geo_id: validatedNasa.geolocation.geo_id,
-          },
-          data: {
-            type: validatedNasa.geolocation.type,
-            coordinates: validatedNasa.geolocation.coordinates,
-          },
-        }
-      );
-
+      const geolocation = await this.prisma.geolocation.create({
+        data: {
+          type: validatedNasa.geolocation.type,
+          coordinates: validatedNasa.geolocation.coordinates,
+        },
+      });
       const updatedNasa = await this.prisma.nasa.update({
-        where: { nasa_id: nasa_id },
+        where: {
+          nasa_id: nasa_id,
+        },
         data: {
           ...validatedNasa,
           geolocation: {
@@ -110,15 +104,11 @@ export class NasaService {
           geolocation: true,
         },
       });
-
-      if (!updatedNasa) {
-        throw new NotFoundException(`Nasa with ID ${nasa_id} not found.`);
-      }
-
       return updatedNasa;
-    } catch (error) {
+        } catch (error) {
       console.error('Erro ao atualizar o registro da NASA:', error); // Log do erro detalhado
       throw new Error('Erro ao atualizar o registro da NASA: ' + error.message);
+
     }
   }
 
