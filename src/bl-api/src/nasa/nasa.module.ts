@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { NasaController } from './nasa.controller';
 import { NasaService } from './nasa.service';
-import { PrismaService } from 'src/prisma.service';
+import { NasaController } from './nasa.controller';
+import { PrismaService } from '../prisma.service';
 
 @Module({
+  imports: [],
+  controllers: [NasaController],
   providers: [NasaService, PrismaService],
-  controllers: [NasaController]
 })
 export class NasaModule {}

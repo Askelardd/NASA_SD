@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { NasaService } from './nasa.service';
-import { NasaDto } from '../dtos/nasa.dto';
+import { NasaInsert } from '../models/nasa.model';
 
 @Controller('nasa')
 export class NasaController {
@@ -17,12 +17,12 @@ export class NasaController {
   }
 
   @Post()
-  async create(@Body() data: NasaDto) {
+  async create(@Body() data: NasaInsert) {
     return await this.nasaService.create(data);
   }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() data: NasaDto) {
+  async update(@Param('id') id: number, @Body() data: NasaInsert) {
     return await this.nasaService.update(+id, data);
   }
 

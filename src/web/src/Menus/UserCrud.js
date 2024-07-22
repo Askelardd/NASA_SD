@@ -34,10 +34,18 @@ function CRUD() {
         fetchUsers();
     }, []);
 
+    useEffect(() => {
+        console.log(users); // Verifique o estado dos utilizadores
+    }, [users]);
+
     const fetchUsers = async () => {
         try {
             const response = await fetch("http://localhost:18080/users");
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
+            console.log(data); // Verifique a resposta da API
             setUsers(data);
         } catch (error) {
             console.error("Error fetching users:", error);
@@ -187,20 +195,26 @@ function CRUD() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {users.map((user) => (
-                                <TableRow key={user.id}>
-                                    <TableCell>{user.username}</TableCell>
-                                    <TableCell>{user.permission}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => handleEdit(user)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton onClick={() => handleDelete(user.id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </TableCell>
+                            {users.length > 0 ? (
+                                users.map((user) => (
+                                    <TableRow key={user.id}>
+                                        <TableCell>{user.username}</TableCell>
+                                        <TableCell>{user.permission}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => handleEdit(user)}>
+                                                <EditIcon />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleDelete(user.id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={3}>No users found</TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>

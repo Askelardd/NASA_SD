@@ -3,19 +3,27 @@ const cors = require("cors");
 const knexConfig = require("./knexfile").db;
 const knex = require("knex")(knexConfig);
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const crypto = require('crypto');
 const cookieParser = require("cookie-parser");
-
 const app = express();
 const SECRET_KEY = "your_secret_key"; // Use uma chave segura e mantenha-a em segredo
 
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
-
 app.get("/", (req, res) => {
   res.send("Auth API");
 });
+
+// Função para gerar salt
+const generateSalt = () => {
+  return crypto.randomBytes(16).toString("hex");
+};
+
+// Função para gerar hash com salt
+const hashPassword = (password, salt) => {
+  return crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
+};
 
 // Middleware para autenticação
 const authenticateToken = (req, res, next) => {
@@ -50,7 +58,13 @@ app.post("/login", async (req, res) => {
 
     const user = await knex("users").where({ username }).first();
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const hashedPassword = hashPassword(password, user.salt);
+
+    if (user.password !== hashedPassword) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -91,11 +105,13 @@ app.post('/adduser', async (req, res) => {
       return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = generateSalt();
+    const hashedPassword = hashPassword(password, salt);
 
     await knex('users').insert({
       username,
       password: hashedPassword,
+      salt,
       permission
     });
     res.sendStatus(201);
@@ -114,13 +130,15 @@ app.put('/users/:id', authenticateToken, authorize("admin"), async (req, res) =>
       return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = generateSalt();
+    const hashedPassword = hashPassword(password, salt);
 
     await knex('users')
       .where({ id })
       .update({
         username,
         password: hashedPassword,
+        salt,
         permission
       });
 

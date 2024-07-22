@@ -29,10 +29,11 @@ model Nasa {
 }
 
 model Geolocation {
-  geo_id          Int      @id @default(autoincrement())
+  geo_id      Int    @id @default(autoincrement())
   type        String
   coordinates String
-  nasa        Nasa?
+  
+  @@unique([type, coordinates]) 
 }
 
 model Teacher {
