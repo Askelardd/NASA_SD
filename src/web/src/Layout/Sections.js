@@ -1,6 +1,7 @@
 import TopTeams from "../Menus/TopTeams";
 import Registar from "../Menus/UserCrud";
 import Login from "../Menus/Login";
+import NasaCRUD from "../Menus/NasaCrud"
 
 
 const Sections = [
@@ -27,6 +28,12 @@ const Sections = [
     label: "Something Else",
     content: <h1>Something else - Work in progresss</h1>
   },
+
+  {
+    id: "NasaCRUD",
+    label: "NasaCRUD",
+    content: <NasaCRUD />
+  }
 ];
 
 export default Sections;

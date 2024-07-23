@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require('crypto');
 const cookieParser = require("cookie-parser");
 const app = express();
-const SECRET_KEY = "your_secret_key"; // Use uma chave segura e mantenha-a em segredo
+const SECRET_KEY = "RickRoled"; // Use uma chave segura e mantenha-a em segredo
 
 app.use(cookieParser());
 app.use(cors());
@@ -56,26 +56,36 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Username and password are required" });
     }
 
+    // Buscar o usuário na base de dados
     const user = await knex("users").where({ username }).first();
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Verificar a senha
     const hashedPassword = hashPassword(password, user.salt);
 
     if (user.password !== hashedPassword) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ permission: user.permission }, SECRET_KEY, { expiresIn: "1d", subject: user.id.toString() });
+    // Criar o token JWT
+    const token = jwt.sign({ permission: user.permission }, SECRET_KEY, { expiresIn: "1h", subject: user.id.toString() });
+
+    // Enviar o token e dados do usuário como cookies
     res.cookie('token', token, { httpOnly: true });
-    res.json({ message: "Login successfully" });
+    res.cookie('userlogin', user.id, { httpOnly: true });
+    res.cookie('username', user.username, { httpOnly: true });
+
+    // Responder com sucesso
+    res.json({ message: "Login successfully", userId: user.id, username: user.username });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred during login" });
   }
 });
+
 
 app.get("/teachers", authenticateToken, async (req, res) => {
   try {
@@ -87,7 +97,7 @@ app.get("/teachers", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/users", authenticateToken, authorize("admin"), async (req, res) => {
+app.get("/users",/*authenticateToken, authorize("admin"),*/ async (req, res) => {
   try {
     const users = await knex.select("*").from("users");
     res.json(users);
@@ -102,7 +112,7 @@ app.post('/adduser', async (req, res) => {
     const { username, password, permission = "view" } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+      return res.status(400).json({ message: "Username, password and permission are required" });
     }
 
     const salt = generateSalt();

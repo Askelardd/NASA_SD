@@ -33,6 +33,7 @@ export class NasaService {
       }
       return nasaRecord;
     } catch (error) {
+      console.error('Erro ao tentar encontrar o registro da NASA:', error);
       throw new Error('Ocorreu um erro ao tentar encontrar o registro da NASA');
     }
   }
