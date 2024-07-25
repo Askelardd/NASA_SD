@@ -24,12 +24,6 @@ const Sections = [
   },
 
   {
-    id: "something-else",
-    label: "Something Else",
-    content: <h1>Something else - Work in progresss</h1>
-  },
-
-  {
     id: "NasaCRUD",
     label: "NasaCRUD",
     content: <NasaCRUD />

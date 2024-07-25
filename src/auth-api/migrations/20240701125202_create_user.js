@@ -1,6 +1,8 @@
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
+ * npm knex migrate:make nome_da_migracao
+ * npm run migrate
  */
 exports.up = function(knex) {
   return knex.schema.createTable("users", (table) => {

@@ -97,7 +97,7 @@ app.get("/teachers", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/users",/*authenticateToken, authorize("admin"),*/ async (req, res) => {
+app.get("/users",authenticateToken, authorize("admin"), async (req, res) => {
   try {
     const users = await knex.select("*").from("users");
     res.json(users);
